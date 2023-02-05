@@ -6,15 +6,14 @@ using System.Threading.Tasks;
 
 namespace DaikinAPI
 {
+    /// <summary>
+    /// Client for the Arduino Daikin AC controller.
+    /// </summary>
     public class DaikinClient : IDisposable
     {
         private HttpClient _httpClient;
         private readonly string _arduinoIpAddress;
         private readonly string _arduinoServiceAddress;
-
-        #region IDisposable
-
-        private bool disposedValue;
 
         public DaikinClient(string arduinoIpAddress)
         {
@@ -23,7 +22,13 @@ namespace DaikinAPI
             _arduinoServiceAddress = $"http://{_arduinoIpAddress}";
         }
 
-        public async Task<DaikinState> GetState()
+        #region Public API
+
+        /// <summary>
+        /// Get the current state of the Daikin AC from Arduino controller.
+        /// </summary>
+        /// <returns><see cref="DaikinState"/>.</returns>
+        public async Task<DaikinState> GetStateAsync()
         {
             var response = await _httpClient.GetAsync(_arduinoServiceAddress);
             response.EnsureSuccessStatusCode();
@@ -39,14 +44,19 @@ namespace DaikinAPI
                 Fan = deserialized.Fan,
                 Mode = deserialized.Mode,
                 Temperature = deserialized.Temperature,
-                TimerOn = deserialized.TimerOn,
-                TimerOnValue = deserialized.TimerOnValue,
-                TimerOff = deserialized.TimerOff,
-                TimerOffValue = deserialized.TimerOffValue,
+                IsOnTimerActive = deserialized.TimerOn != 0,
+                OnTimerValue = deserialized.TimerOnValue,
+                IsOffTimerActive = deserialized.TimerOff != 0,
+                OffTimerValue = deserialized.TimerOffValue,
             };
         }
 
-        public async Task SetState(DaikinState state)
+        /// <summary>
+        /// Set the desired state of the Daikin AC.
+        /// </summary>
+        /// <param name="state"><see cref="DaikinState"/>.</param>
+        /// <returns><see cref="Task"/>.</returns>
+        public async Task SetStateAsync(DaikinState state)
         {
             var response = await _httpClient.GetAsync(
                 $"{_arduinoServiceAddress}" +
@@ -58,6 +68,12 @@ namespace DaikinAPI
                 );
             response.EnsureSuccessStatusCode();
         }
+
+        #endregion // Public API
+
+        #region IDisposable
+
+        private bool disposedValue;
 
         protected virtual void Dispose(bool disposing)
         {
