@@ -15,14 +15,17 @@ namespace DaikinAPI
         private readonly string _arduinoIpAddress;
         private readonly string _arduinoServiceAddress;
 
+        /// <summary>
+        /// Ctor.
+        /// </summary>
+        /// <param name="arduinoIpAddress">IP address of the Arduino controller. Currently hard-coded in the Arduino program.</param>
+        /// <exception cref="ArgumentNullException"></exception>
         public DaikinClient(string arduinoIpAddress)
         {
             _httpClient = new HttpClient();
             _arduinoIpAddress = arduinoIpAddress ?? throw new ArgumentNullException(nameof(arduinoIpAddress));
             _arduinoServiceAddress = $"http://{_arduinoIpAddress}";
         }
-
-        #region Public API
 
         /// <summary>
         /// Get the current state of the Daikin AC from Arduino controller.
@@ -68,8 +71,6 @@ namespace DaikinAPI
                 );
             response.EnsureSuccessStatusCode();
         }
-
-        #endregion // Public API
 
         #region IDisposable
 
