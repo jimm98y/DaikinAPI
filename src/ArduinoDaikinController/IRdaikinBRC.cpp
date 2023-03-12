@@ -1,27 +1,20 @@
-/*
-* Arduino IRremote Daikin 2015
-* Copyright 2015 danny
-*
-*
-* Arduino PWM declare base on  Ken Shirriff's IRremote library.
-* http://arcfn.com/2009/08/multi-protocol-infrared-remote-library.html
-*
-*
-*/
+// Copyright 2019 Jimm98y
+// Copyright 2015 danny
+// Arduino IRremote Daikin 2015
 
 #include "IRdaikinBRC.h"
 
-//http://www.daikin.co.uk/contacts-and-downloads/operation-manuals/air-conditioning/
-//http://www.daikin.co.uk/binaries/OM%20-%20BRC4C61~4_3P107422-21S_EN_tcm511-242366.pdf
+// http://www.daikin.co.uk/contacts-and-downloads/operation-manuals/air-conditioning/
+// http://www.daikin.co.uk/binaries/OM%20-%20BRC4C61~4_3P107422-21S_EN_tcm511-242366.pdf
 
 // # of bytes per command
 const int COMMAND_LENGTH_BRC = 22;
 unsigned char daikinBRC[COMMAND_LENGTH_BRC] = {
 	0x11, 0xDA, 0x17, 0x18,   0x04, 0x00,    0x1E,
 	0x11, 0xDA, 0x17, 0x18,   0x00, 0x73, 0x00, 0x20, 0x02, 0x2, 0x2E, 0x36, 0x00, 0x20,    0x35
-};  //7th                   //11th
+};
 
-                                // low, medium, high
+                            // low, medium, high
 static byte vFanTableBRC[] = { 0x10, 0x30, 0x50 };
 
                                 // fan, sun, cool, auto, rain
@@ -33,58 +26,47 @@ static byte vTempTableBRC[] = { 14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,
 
 int IRpin;
 
-void IRdaikinBRC::daikin_on()
-{
+void IRdaikinBRC::daikin_on() {
 	daikinController_on();
 }
 
-void IRdaikinBRC::daikin_off()
-{
+void IRdaikinBRC::daikin_off() {
 	daikinController_off();
 }
 
-void IRdaikinBRC::daikin_setSwing_on()
-{
+void IRdaikinBRC::daikin_setSwing_on() {
 	daikinBRC[18] &= 0xfc;
 	daikinBRC[18] |= 0x01;
 	daikinController_checksum();
 }
 
-void IRdaikinBRC::daikin_setSwing_off()
-{
+void IRdaikinBRC::daikin_setSwing_off() {
 	daikinBRC[18] &= 0xfc;
 	daikinBRC[18] |= 0x02;
 	daikinController_checksum();
 }
 
-void IRdaikinBRC::daikin_setMode(int mode)
-{
-	if (mode >= 0 && mode <= 4)
-	{
+void IRdaikinBRC::daikin_setMode(int mode) {
+	if (mode >= 0 && mode <= 4) {
 		daikinController_setMode(mode);
 	}
 }
 
-void IRdaikinBRC::daikin_setFan(int speed)
-{
-	if (speed >= 0 && speed <= 2)
-	{
+void IRdaikinBRC::daikin_setFan(int speed) {
+	if (speed >= 0 && speed <= 2) {
 		daikinController_setFan(vFanTableBRC[speed]);
 	}
 }
 
-void IRdaikinBRC::daikin_setTemp(uint8_t temp)
-{
+void IRdaikinBRC::daikin_setTemp(uint8_t temp) {
 	daikinController_setTemp(temp);
 }
 
-void IRdaikinBRC::daikin_sendCommand()
-{
+void IRdaikinBRC::daikin_sendCommand() {
 	sendDaikinCommand();
 }
 
-uint8_t IRdaikinBRC::daikinController_checksum()
-{
+uint8_t IRdaikinBRC::daikinController_checksum() {
 	uint8_t sum = 0;
 	uint8_t i;
 
@@ -104,8 +86,7 @@ uint8_t IRdaikinBRC::daikinController_checksum()
 	daikinBRC[21] = sum & 0xFF;
 }
 
-void IRdaikinBRC::dump()
-{
+void IRdaikinBRC::dump() {
 	uint8_t i;
 	for (i = 0; i <COMMAND_LENGTH_BRC; i++) {
 		Serial.print(daikinBRC[i], HEX);
@@ -113,46 +94,36 @@ void IRdaikinBRC::dump()
 	}
 }
 
-//private function
-
-void IRdaikinBRC::daikinController_on()
-{
+void IRdaikinBRC::daikinController_on() {
 	daikinBRC[14] |= 0x01;
 	daikinController_checksum();
 }
 
-void IRdaikinBRC::daikinController_off()
-{
+void IRdaikinBRC::daikinController_off() {
 	daikinBRC[14] &= 0xFE;
 	daikinController_checksum();
 }
 
-void IRdaikinBRC::daikinController_setTemp(uint8_t temp)
-{
-	if (temp >= 16 && temp <= 32)
-	{
+void IRdaikinBRC::daikinController_setTemp(uint8_t temp) {
+	if (temp >= 16 && temp <= 32) 	{
 		temp = temp - 16;
 		daikinBRC[17] = vTempTableBRC[temp];
 		daikinController_checksum();
 	}
 }
 
-
-void IRdaikinBRC::daikinController_setFan(uint8_t fan)
-{
+void IRdaikinBRC::daikinController_setFan(uint8_t fan) {
 	daikinBRC[18] &= 0x8f;
 	daikinBRC[18] |= fan;
 
 	daikinController_checksum();
 }
 
-uint8_t IRdaikinBRC::daikinController_getState()
-{
+uint8_t IRdaikinBRC::daikinController_getState() {
 	return (daikinBRC[14]) & 0x01; // power on/off?
 }
 
-void IRdaikinBRC::daikinController_setMode(uint8_t mode)
-{
+void IRdaikinBRC::daikinController_setMode(uint8_t mode) {
 	if (mode >= 0 && mode <= 4)
 	{
 		daikinBRC[12] &= 0x8f;
@@ -164,21 +135,19 @@ void IRdaikinBRC::daikinController_setMode(uint8_t mode)
 	}
 }
 
-void IRdaikinBRC::sendDaikinCommand()
-{
+void IRdaikinBRC::sendDaikinCommand() {
 	daikinController_checksum();
 	sendDaikin(daikinBRC, 7, 0);
 	delay(29);
 	sendDaikin(daikinBRC, 15, 7);
-
 	printARCState(daikinBRC + 7);
 }
 
 void IRdaikinBRC::sendDaikin(unsigned char buf[], int len, int start) {
 	int data2;
 	enableIROut(38);
-	  mark(DAIKIN_HDR_MARK);
-	  space(DAIKIN_HDR_SPACE);
+	mark(DAIKIN_HDR_MARK);
+	space(DAIKIN_HDR_SPACE);
 
 	for (int i = start; i < start + len; i++) {
 		data2 = buf[i];
@@ -191,11 +160,10 @@ void IRdaikinBRC::sendDaikin(unsigned char buf[], int len, int start) {
 			else {
 				mark(DAIKIN_ZERO_MARK);
 				space(DAIKIN_ZERO_SPACE);
-
 			}
 		}
-
 	}
+
 	mark(DAIKIN_ONE_MARK);
 	space(DAIKIN_ZERO_SPACE);
 }
@@ -220,8 +188,7 @@ void IRdaikinBRC::sendDaikinWake() {
 	space(DAIKIN_ZERO_MARK);
 }
 
-void IRdaikinBRC::sendRaw(unsigned int buf[], int len, int hz)
-{
+void IRdaikinBRC::sendRaw(unsigned int buf[], int len, int hz) {
 	enableIROut(hz);
 	for (int i = 0; i < len; i++) {
 		if (i & 1) {
@@ -231,33 +198,15 @@ void IRdaikinBRC::sendRaw(unsigned int buf[], int len, int hz)
 			mark(buf[i]);
 		}
 	}
-	space(0); // Just to be sure
+	space(0); // just to be sure
 }
 
 void IRdaikinBRC::setPin(int pin) {
 	pinMode(IRpin, OUTPUT);
-	digitalWrite(IRpin, LOW); // When not sending PWM, we want it low
+	digitalWrite(IRpin, LOW); // when not sending PWM, we want it low
 	IRpin = pin;
 }
 
-//~ #if defined(SIMULATE)
-
-//~ void IRdaikinBRC::mark(int time) {
-//~ int cycleTime = time/25;
-//~ for (int i = 0; i < cycleTime; ++i)
-//~ {
-//~ digitalWrite(IRpin,HIGH);
-//~ delayMicroseconds(11);
-//~ digitalWrite(IRpin,LOW);
-//~ delayMicroseconds(5);
-//~ }
-//~ }
-
-//~ void IRdaikinBRC::space(int time) {
-//~ digitalWrite(IRpin,LOW);
-//~ delayMicroseconds(time);
-//~ }
-//~ #else
 void IRdaikinBRC::mark(int time) {
 	// Sends an IR mark for the specified number of microseconds.
 	// The mark output is modulated at the PWM frequency.
@@ -273,54 +222,31 @@ void IRdaikinBRC::space(int time) {
 	delayMicroseconds(time);
 }
 
-//~ #endif
-
-
 void IRdaikinBRC::enableIROut(int khz) {
-	// Enables IR output.  The khz value controls the modulation frequency in kilohertz.
+	// Enables IR output. The khz value controls the modulation frequency in kilohertz.
 	// The IR output will be on pin 3 (OC2B).
-	// This routine is designed for 36-40KHz; if you use it for other values, it's up to you
-	// to make sure it gives reasonable results.  (Watch out for overflow / underflow / rounding.)
-	// TIMER2 is used in phase-correct PWM mode, with OCR2A controlling the frequency and OCR2B
-	// controlling the duty cycle.
-	// There is no prescaling, so the output frequency is 16MHz / (2 * OCR2A)
-	// To turn the output on and off, we leave the PWM running, but connect and disconnect the output pin.
-	// A few hours staring at the ATmega documentation and this will all make sense.
-	// See my Secrets of Arduino PWM at http://arcfn.com/2009/07/secrets-of-arduino-pwm.html for details.
-
-
-	// Disable the Timer2 Interrupt (which is used for receiving IR)
-	//TIMER_DISABLE_INTR; //Timer2 Overflow Interrupt
-
 	pinMode(TIMER_PWM_PIN, OUTPUT);
-	//digitalWrite(TIMER_PWM_PIN, HIGH); // When not sending PWM, we want it low
-	//
 
-
-	// COM2A = 00: disconnect OC2A
-	// COM2B = 00: disconnect OC2B; to send signal set to 10: OC2B non-inverted
-	// WGM2 = 101: phase-correct PWM with OCRA as top
-	// CS2 = 000: no prescaling
-	// The top value for the timer.  The modulation frequency will be SYSCLOCK / 2 / OCR2A.
+	// The top value for the timer. The modulation frequency will be SYSCLOCK / 2 / OCR2A.
 	TIMER_CONFIG_KHZ(khz);
 }
 
-void IRdaikinBRC::updateBRC(uint8_t* buffer, int buffer_size)
-{
+void IRdaikinBRC::updateBRC(uint8_t* buffer, int buffer_size) {
   uint8_t i = 4;
-  for(i = 4; i < buffer_size; i++)
-  {
-    #ifdef DEBUG_IR_PRINT
-    Serial.print(buffer[i], HEX);
-    Serial.print(" ");
-    #endif
+  for(i = 4; i < buffer_size; i++)   {
+	
+#ifdef DEBUG_IR_PRINT
+     Serial.print(buffer[i], HEX);
+     Serial.print(" ");
+#endif
 
-    // update the BRC
-    daikinBRC[7 + i] = buffer[i];
+     // update the BRC
+     daikinBRC[7 + i] = buffer[i];
    }
-   #ifdef DEBUG_IR_PRINT
+
+#ifdef DEBUG_IR_PRINT
    Serial.println();
-   #endif
+#endif
 }
 
 void IRdaikinBRC::getState(
@@ -333,8 +259,7 @@ void IRdaikinBRC::getState(
     uint8_t* timerOff,
     uint8_t* timerOffValue,
     uint8_t* mode) {
-  
-  uint8_t* recvData = daikinBRC + 7;
+    uint8_t* recvData = daikinBRC + 7;
 
 	/*
 	11 DA 17 18 0 73 0 20 0 F E 35 0 20 1F 	// 16C // 14 // MIN
@@ -388,18 +313,19 @@ void IRdaikinBRC::getState(
 	*timerOn = /* recvData[5] & B00001100 == 0x4; */ recvData[8] >> 7;
 	// first bit indicates whether the time os on (1) or off (0)
 	// the next 7 bits contain the value
+
 	// on byte|off byte
 	*timerOnValue = recvData[8] & B01111111;
 	*timerOff = /* recvData[5] & B00001100 == 0x8; */ recvData[9] >> 7;
 	*timerOffValue = recvData[9] & B01111111;
 
-	//11 DA 17 18 looks like standard Daikin preamble
+	// 11 DA 17 18 looks like standard Daikin preamble
 	/*
-	11 DA 17 18 0 63 4  0 0 F 10 35 0 20 F5 // ventilator // 63!!!
-	11 DA 17 18 0 73 4 10 0 F 18 35 0 20 1D // slunicko
-	11 DA 17 18 0 73 4 20 0 F 18 35 0 20 2D // snehova vlocka
-	11 DA 17 18 0 23 4 70 0 F 10 35 0 20 25 // dest // 23!!!
-	11 DA 17 18 0 73 4 10 0 F 18 35 0 20 1D // slunicko
+	11 DA 17 18 0 63 4  0 0 F 10 35 0 20 F5 // fan // 63!!!
+	11 DA 17 18 0 73 4 10 0 F 18 35 0 20 1D // sun
+	11 DA 17 18 0 73 4 20 0 F 18 35 0 20 2D // snowflake
+	11 DA 17 18 0 23 4 70 0 F 10 35 0 20 25 // rain // 23!!!
+	11 DA 17 18 0 73 4 10 0 F 18 35 0 20 1D // sun
 	11 DA 17 18 0 73 4 30 0 F 1A 35 0 20 3F // Auto M:
 
 	11 DA 17 18 0 73 0 30 2 2 20 35 0 20 36 // H
@@ -413,15 +339,15 @@ void IRdaikinBRC::getState(
 
 void IRdaikinBRC::printARCState(uint8_t *recvData) {
 	uint8_t temperature = 0;
-  uint8_t fan = 0;
-  uint8_t powerState = 0;
-  uint8_t swing = 0;
-  uint8_t timerOn = 0;
-  uint8_t timerOnValue = 0;
-  uint8_t timerOff = 0;
-  uint8_t timerOffValue = 0;
-  uint8_t mode = 0;
-  getState(&temperature, &fan, &powerState, &swing, &timerOn, &timerOnValue, &timerOff, &timerOffValue, &mode);
+    uint8_t fan = 0;
+    uint8_t powerState = 0;
+    uint8_t swing = 0;
+    uint8_t timerOn = 0;
+    uint8_t timerOnValue = 0;
+    uint8_t timerOff = 0;
+    uint8_t timerOffValue = 0;
+    uint8_t mode = 0;
+    getState(&temperature, &fan, &powerState, &swing, &timerOn, &timerOnValue, &timerOff, &timerOffValue, &mode);
 
 	// write currently decoded message to the output
 	Serial.println("==DRB==");
@@ -454,4 +380,3 @@ void IRdaikinBRC::printARCState(uint8_t *recvData) {
 	Serial.println();
 	Serial.println("==DRE==");
 }
-

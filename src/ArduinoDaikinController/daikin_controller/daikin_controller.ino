@@ -1,3 +1,5 @@
+// Copyright 2019 Jimm98y
+
 #include <SPI.h>
 #include <UIPEthernet.h>
 
@@ -11,8 +13,12 @@
 #define INITIAL_DELAY 500
 #define MSG_BUFFER_LEN 200
 
+// any MAC address for the network interface
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+
+// TODO: hardcoded IP address
 IPAddress ip(192, 168, 1, 55);
+
 EthernetServer server(80);
 char readMessage[MSG_BUFFER_LEN];
 
@@ -144,8 +150,7 @@ void loop() {
         DBGMSG(F("Power on"));
         irsend.daikin_on();
         isCommand++;
-      }
-      else if (strncmp(f + 6, "off", 3) == 0) {
+      } else if (strncmp(f + 6, "off", 3) == 0) {
         DBGMSG(F("Power off"));
         irsend.daikin_off();
         isCommand++;
@@ -158,8 +163,7 @@ void loop() {
         DBGMSG(F("Swing on"));
         irsend.daikin_setSwing_on();
         isCommand++;
-      }
-      else if (strncmp(f + 6, "off", 3) == 0) {
+      } else if (strncmp(f + 6, "off", 3) == 0) {
         DBGMSG(F("Swing off"));
         irsend.daikin_setSwing_off();
         isCommand++;
@@ -173,8 +177,7 @@ void loop() {
         DBGMSG(F("Set temperature"));
         irsend.daikin_setTemp(temp);
         isCommand++;
-      }
-      else {
+      } else {
         DBGMSG(F("out of range.  16 <= temp <= 32"));
       }
     }
@@ -186,8 +189,7 @@ void loop() {
         DBGMSG(F("Set fan"));
         irsend.daikin_setFan(spd);
         isCommand++;
-      }
-      else {
+      } else {
         DBGMSG(F("out of range.  0 <= speed <= 2"));
       }
     }
@@ -199,8 +201,7 @@ void loop() {
         DBGMSG(F("Set mode"));
         irsend.daikin_setMode(mode);
         isCommand++;
-      }
-      else {
+      } else {
         DBGMSG(F("out of range.  0 <= mode <= 4"));
       }
     }

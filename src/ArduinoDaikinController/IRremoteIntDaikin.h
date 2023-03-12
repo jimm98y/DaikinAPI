@@ -1,13 +1,6 @@
-/*
- * Arduino IRremote Daikin 2015
- * Copyright 2015 danny
- *
- *
- * Arduino PWM declare base on  Ken Shirriff's IRremote library.
- * http://arcfn.com/2009/08/multi-protocol-infrared-remote-library.html
- *
- *
- */
+// Copyright 2019 Jimm98y
+// Copyright 2015 danny
+// Arduino IRremote Daikin 2015
 
 #ifndef IRremoteintDaikin_h
 #define IRremoteintDaikin_h
@@ -99,10 +92,7 @@
 #define SPACE 1
 
 #define TOPBIT 0x80000000
-//
 #define DAIKIN_BITS 99
-
-
 
 // defines for timer2 (8 bits)
 #if defined(IR_USE_TIMER2)
@@ -250,7 +240,6 @@
 #else
 #error "Please add OC4A pin number here\n"
 #endif
-
 
 // defines for timer4 (16 bits)
 #elif defined(IR_USE_TIMER4)

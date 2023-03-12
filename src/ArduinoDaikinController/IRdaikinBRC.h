@@ -1,13 +1,6 @@
-/*
- * Arduino IRremote Daikin 2015
- * Copyright 2015 danny
- *
- *
- * Arduino PWM declare base on  Ken Shirriff's IRremote library.
- * http://arcfn.com/2009/08/multi-protocol-infrared-remote-library.html
- *
- *
- */
+// Copyright 2019 Jimm98y
+// Copyright 2015 danny
+// Arduino IRremote Daikin 2015
 
 #ifndef IRdaikinBRC_h
 #define IRdaikinBRC_h
@@ -16,16 +9,15 @@
 #include <string.h> //needed for memcpy
 #include "IRremoteIntDaikin.h"
 
-class IRdaikinBRC
-{
+class IRdaikinBRC {
 public:
   void daikin_on();
 	void daikin_off();
 	void daikin_setSwing_on();
 	void daikin_setSwing_off();
-	void daikin_setMode(int mode);//
-	void daikin_setFan(int speed);// 0~1 Hi,Low
-	void daikin_setTemp(uint8_t temp);//16 ~ 32
+	void daikin_setMode(int mode);
+	void daikin_setFan(int speed); // 0~1 Hi,Low
+	void daikin_setTemp(uint8_t temp); //16 ~ 32
 	void daikin_sendCommand();
 	void dump();
 

@@ -1,30 +1,21 @@
-/*
- * Arduino IRremote Daikin 2015
- * Copyright 2015 danny
- *
- *
- * enableIROut declare base on  Ken Shirriff's IRremote library.
- * http://arcfn.com/2009/08/multi-protocol-infrared-remote-library.html
- *
- *
- */
+// Copyright 2019 Jimm98y
+// Copyright 2015 danny
+// Arduino IRremote Daikin 2015
 
 #ifndef IRremoteDaikinRecv_h
 #define IRremoteDaikinRecv_h
 
 #include <Arduino.h> //needed for Serial.println
-#include <string.h> //needed for memcpy
+#include <string.h> // needed for memcpy
 #include "IRremoteIntDaikin.h"
 
 // Only used for testing; can remove virtual for shorter code
 #define VIRTUAL
 
-class IRDaikinRecv
-{
+class IRDaikinRecv {
 public:
   uint8_t *irReceiveDataP0;
 
-	//~ IRDaikinRecv() {}
 	uint8_t begin(uint8_t pin,uint8_t *buffer,uint8_t buffer_size);
 	uint8_t decode();
 
