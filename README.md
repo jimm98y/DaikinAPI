@@ -9,12 +9,12 @@ Simplified connection diagram looks like this: https://www.circuito.io/app?compo
 To control the air conditioning unit use the DaikinClient. 
 
 Create the DaikinClient:
-```
+```cs
 var daikinClient = new DaikinClient("192.168.1.55");
 ```
 
 Get the current status:
-```
+```cs
 var status = await daikinClient.GetStateAsync();
 ```
 
